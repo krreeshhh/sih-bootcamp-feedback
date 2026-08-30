@@ -265,7 +265,7 @@ export default function FeedbackFormPage() {
                         if (!err && !regNoError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="Your name"
+                    placeholder="Minimum 5 letters"
                     maxLength={20}
                     className={`form-input ${nameError ? "input-error" : ""}`}
                     autoComplete="name"
@@ -298,7 +298,7 @@ export default function FeedbackFormPage() {
                         if (!err && !nameError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="e.g. 25A108001"
+                    placeholder="Minimum 8 characters"
                     maxLength={9}
                     className={`form-input ${regNoError ? "input-error" : ""}`}
                     autoComplete="off"
