@@ -31,12 +31,11 @@ const RATING_OPTIONS: RatingOption[] = [
 ];
 
 const HIGHLIGHT_OPTIONS = [
-  "Soldering session",
-  "Pace felt fast",
-  "Need more kits",
+  "Problem-solving",
+  "Learning new tools",
   "Loved the demo",
-  "Multimeter walkthrough",
-  "Wanted more time",
+  "Mentorship support",
+  "Project showcase",
 ];
 
 export default function FeedbackFormPage() {
