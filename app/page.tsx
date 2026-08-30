@@ -48,19 +48,25 @@ export default function FeedbackFormPage() {
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [ratingError, setRatingError] = useState<boolean>(false);
+  const [highlightsError, setHighlightsError] = useState<boolean>(false);
   const [commentError, setCommentError] = useState<boolean>(false);
 
   const toggleHighlight = (item: string) => {
-    setHighlights((prev) =>
-      prev.includes(item) ? prev.filter((h) => h !== item) : [...prev, item]
-    );
+    setHighlights((prev) => {
+      const next = prev.includes(item) ? prev.filter((h) => h !== item) : [...prev, item];
+      if (highlightsError && next.length > 0) {
+        setHighlightsError(false);
+        if (!ratingError && !commentError) setErrorMsg(null);
+      }
+      return next;
+    });
   };
 
   const handleRatingSelect = (val: RatingType) => {
     setRating(val);
     if (ratingError) {
       setRatingError(false);
-      if (!commentError) setErrorMsg(null);
+      if (!commentError && !highlightsError) setErrorMsg(null);
     }
   };
 
@@ -72,13 +78,17 @@ export default function FeedbackFormPage() {
       setRatingError(true);
       hasError = true;
     }
+    if (highlights.length === 0) {
+      setHighlightsError(true);
+      hasError = true;
+    }
     if (!comment.trim()) {
       setCommentError(true);
       hasError = true;
     }
 
     if (hasError) {
-      setErrorMsg("Please complete the required fields marked with *");
+      setErrorMsg("Please complete all required fields marked with *");
       return;
     }
 
@@ -124,6 +134,7 @@ export default function FeedbackFormPage() {
     setSubmitted(false);
     setErrorMsg(null);
     setRatingError(false);
+    setHighlightsError(false);
     setCommentError(false);
   };
 
@@ -170,7 +181,7 @@ export default function FeedbackFormPage() {
               <h1 className="card-title">How was today?</h1>
             </div>
 
-            {/* Overall Rating */}
+            {/* Overall Rating (Compulsory) */}
             <div className="form-section">
               <label className="section-label">
                 Overall experience <span style={{ color: "#ffffff" }}>*</span>
@@ -204,11 +215,11 @@ export default function FeedbackFormPage() {
               )}
             </div>
 
-            {/* Confidence Slider */}
+            {/* Confidence Slider (Compulsory) */}
             <div className="form-section">
               <div className="section-label-row">
                 <label htmlFor="confidence-range" className="section-label" style={{ margin: 0 }}>
-                  Confidence with the tools
+                  Confidence with the tools <span style={{ color: "#ffffff" }}>*</span>
                 </label>
                 <span className="slider-val-badge">{confidence}%</span>
               </div>
@@ -235,9 +246,11 @@ export default function FeedbackFormPage() {
               </div>
             </div>
 
-            {/* What Stood Out */}
+            {/* What Stood Out (Compulsory) */}
             <div className="form-section">
-              <label className="section-label">What stood out to you?</label>
+              <label className="section-label">
+                What stood out to you? <span style={{ color: "#ffffff" }}>*</span>
+              </label>
               <div className="chips-grid">
                 {HIGHLIGHT_OPTIONS.map((item) => {
                   const isSelected = highlights.includes(item);
@@ -254,6 +267,12 @@ export default function FeedbackFormPage() {
                   );
                 })}
               </div>
+              {highlightsError && (
+                <div className="error-text" style={{ marginTop: "8px" }}>
+                  <IconAlertCircle size={14} stroke={2} />
+                  <span>Please select at least one highlight</span>
+                </div>
+              )}
             </div>
 
             {/* Key Takeaway / Feedback (Compulsory) */}
@@ -269,7 +288,7 @@ export default function FeedbackFormPage() {
                   setComment(e.target.value);
                   if (commentError && e.target.value.trim()) {
                     setCommentError(false);
-                    if (!ratingError) setErrorMsg(null);
+                    if (!ratingError && !highlightsError) setErrorMsg(null);
                   }
                 }}
                 placeholder="What did you learn today, or how could we improve?"
@@ -284,8 +303,8 @@ export default function FeedbackFormPage() {
               )}
             </div>
 
-            {/* Error banner if submission failed */}
-            {errorMsg && !ratingError && !commentError && (
+            {/* General error message banner */}
+            {errorMsg && !ratingError && !highlightsError && !commentError && (
               <div className="error-text" style={{ marginBottom: "12px" }}>
                 <IconAlertCircle size={15} stroke={2} />
                 <span>{errorMsg}</span>
