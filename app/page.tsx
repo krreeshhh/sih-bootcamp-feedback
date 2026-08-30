@@ -82,7 +82,6 @@ export default function FeedbackFormPage() {
         console.warn(
           "Firebase config missing in environment variables. Simulated submission recorded."
         );
-        // Simulate network delay for mock / test environments
         await new Promise((resolve) => setTimeout(resolve, 600));
         setSubmitted(true);
         return;
@@ -117,9 +116,9 @@ export default function FeedbackFormPage() {
     setRatingError(false);
   };
 
-  // Dynamic slider background fill percentage
+  // Dynamic monochrome slider background fill
   const sliderFillStyle = {
-    background: `linear-gradient(to right, #60a5fa 0%, #3b82f6 ${confidence}%, rgba(255, 255, 255, 0.18) ${confidence}%, rgba(255, 255, 255, 0.18) 100%)`,
+    background: `linear-gradient(to right, #ffffff 0%, #ffffff ${confidence}%, rgba(255, 255, 255, 0.15) ${confidence}%, rgba(255, 255, 255, 0.15) 100%)`,
   };
 
   return (
@@ -163,7 +162,7 @@ export default function FeedbackFormPage() {
             {/* Overall Rating */}
             <div className="form-section">
               <label className="section-label">
-                Overall experience <span style={{ color: "#93c5fd" }}>*</span>
+                Overall experience <span style={{ color: "#ffffff" }}>*</span>
               </label>
               <div className="rating-grid">
                 {RATING_OPTIONS.map((opt) => {
@@ -294,7 +293,7 @@ export default function FeedbackFormPage() {
       </div>
 
       <footer className="footer-text">
-        SIH Hardware Bootcamp • Built with Next.js & Firestore
+        SIH Hardware Bootcamp • Minimal Monochrome Edition
       </footer>
     </main>
   );
