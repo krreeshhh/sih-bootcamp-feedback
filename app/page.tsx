@@ -13,6 +13,8 @@ import {
   IconCheck,
   IconAlertCircle,
   IconRotateClockwise,
+  IconUser,
+  IconId,
 } from "@tabler/icons-react";
 
 type RatingType = "sad" | "neutral" | "happy" | "excited";
@@ -39,6 +41,8 @@ const HIGHLIGHT_OPTIONS = [
 ];
 
 export default function FeedbackFormPage() {
+  const [name, setName] = useState<string>("");
+  const [regNo, setRegNo] = useState<string>("");
   const [rating, setRating] = useState<RatingType | null>(null);
   const [confidence, setConfidence] = useState<number>(75);
   const [highlights, setHighlights] = useState<string[]>([]);
@@ -46,26 +50,22 @@ export default function FeedbackFormPage() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [nameError, setNameError] = useState<boolean>(false);
+  const [regNoError, setRegNoError] = useState<boolean>(false);
   const [ratingError, setRatingError] = useState<boolean>(false);
-  const [highlightsError, setHighlightsError] = useState<boolean>(false);
   const [commentError, setCommentError] = useState<boolean>(false);
 
   const toggleHighlight = (item: string) => {
-    setHighlights((prev) => {
-      const next = prev.includes(item) ? prev.filter((h) => h !== item) : [...prev, item];
-      if (highlightsError && next.length > 0) {
-        setHighlightsError(false);
-        if (!ratingError && !commentError) setErrorMsg(null);
-      }
-      return next;
-    });
+    setHighlights((prev) =>
+      prev.includes(item) ? prev.filter((h) => h !== item) : [...prev, item]
+    );
   };
 
   const handleRatingSelect = (val: RatingType) => {
     setRating(val);
     if (ratingError) {
       setRatingError(false);
-      if (!commentError && !highlightsError) setErrorMsg(null);
+      if (!commentError && !nameError && !regNoError) setErrorMsg(null);
     }
   };
 
@@ -73,12 +73,16 @@ export default function FeedbackFormPage() {
     e.preventDefault();
 
     let hasError = false;
-    if (!rating) {
-      setRatingError(true);
+    if (!name.trim()) {
+      setNameError(true);
       hasError = true;
     }
-    if (highlights.length === 0) {
-      setHighlightsError(true);
+    if (!regNo.trim()) {
+      setRegNoError(true);
+      hasError = true;
+    }
+    if (!rating) {
+      setRatingError(true);
       hasError = true;
     }
     if (!comment.trim()) {
@@ -87,7 +91,7 @@ export default function FeedbackFormPage() {
     }
 
     if (hasError) {
-      setErrorMsg("Please complete all required fields marked with *");
+      setErrorMsg("Please complete all required fields");
       return;
     }
 
@@ -107,6 +111,8 @@ export default function FeedbackFormPage() {
       }
 
       await addDoc(collection(db, "feedback"), {
+        name: name.trim(),
+        regNo: regNo.trim().toUpperCase(),
         rating,
         confidence: Number(confidence),
         highlights,
@@ -126,14 +132,17 @@ export default function FeedbackFormPage() {
   };
 
   const handleReset = () => {
+    setName("");
+    setRegNo("");
     setRating(null);
     setConfidence(75);
     setHighlights([]);
     setComment("");
     setSubmitted(false);
     setErrorMsg(null);
+    setNameError(false);
+    setRegNoError(false);
     setRatingError(false);
-    setHighlightsError(false);
     setCommentError(false);
   };
 
@@ -157,7 +166,7 @@ export default function FeedbackFormPage() {
             </div>
             <h2 className="success-title">Thanks for the feedback!</h2>
             <p className="success-desc">
-              Your response has been recorded anonymously. Best of luck with your hardware
+              Your response has been successfully recorded. Best of luck with your hardware
               projects!
             </p>
             <button
@@ -178,6 +187,69 @@ export default function FeedbackFormPage() {
                 <span>SIH hardware bootcamp</span>
               </div>
               <h1 className="card-title">How was today?</h1>
+            </div>
+
+            {/* Student Info (Name & Reg No) */}
+            <div className="form-row-grid">
+              <div className="form-section">
+                <label htmlFor="student-name" className="section-label">
+                  Name
+                </label>
+                <div className="input-wrapper">
+                  <IconUser size={16} className="input-icon" stroke={1.8} />
+                  <input
+                    id="student-name"
+                    type="text"
+                    value={name}
+                    onChange={(e) => {
+                      setName(e.target.value);
+                      if (nameError && e.target.value.trim()) {
+                        setNameError(false);
+                        if (!ratingError && !commentError && !regNoError) setErrorMsg(null);
+                      }
+                    }}
+                    placeholder="Your name"
+                    className={`form-input ${nameError ? "input-error" : ""}`}
+                    autoComplete="name"
+                  />
+                </div>
+                {nameError && (
+                  <div className="error-text">
+                    <IconAlertCircle size={14} stroke={2} />
+                    <span>Enter your name</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="form-section">
+                <label htmlFor="student-regno" className="section-label">
+                  Reg No
+                </label>
+                <div className="input-wrapper">
+                  <IconId size={16} className="input-icon" stroke={1.8} />
+                  <input
+                    id="student-regno"
+                    type="text"
+                    value={regNo}
+                    onChange={(e) => {
+                      setRegNo(e.target.value);
+                      if (regNoError && e.target.value.trim()) {
+                        setRegNoError(false);
+                        if (!ratingError && !commentError && !nameError) setErrorMsg(null);
+                      }
+                    }}
+                    placeholder="e.g. 25108.."
+                    className={`form-input ${regNoError ? "input-error" : ""}`}
+                    autoComplete="off"
+                  />
+                </div>
+                {regNoError && (
+                  <div className="error-text">
+                    <IconAlertCircle size={14} stroke={2} />
+                    <span>Enter your reg no</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Overall Rating (Compulsory) */}
@@ -218,7 +290,7 @@ export default function FeedbackFormPage() {
             <div className="form-section">
               <div className="section-label-row">
                 <label htmlFor="confidence-range" className="section-label" style={{ margin: 0 }}>
-                  Confidence with the tools 
+                  Confidence on hardware after today
                 </label>
                 <span className="slider-val-badge">{confidence}%</span>
               </div>
@@ -245,10 +317,10 @@ export default function FeedbackFormPage() {
               </div>
             </div>
 
-            {/* What Stood Out (Compulsory) */}
+            {/* What Stood Out (Optional) */}
             <div className="form-section">
               <label className="section-label">
-                What stood out to you? 
+                What stood out to you?
               </label>
               <div className="chips-grid">
                 {HIGHLIGHT_OPTIONS.map((item) => {
@@ -266,12 +338,6 @@ export default function FeedbackFormPage() {
                   );
                 })}
               </div>
-              {highlightsError && (
-                <div className="error-text" style={{ marginTop: "8px" }}>
-                  <IconAlertCircle size={14} stroke={2} />
-                  <span>Please select at least one highlight</span>
-                </div>
-              )}
             </div>
 
             {/* Key Takeaway / Feedback (Compulsory) */}
@@ -287,7 +353,7 @@ export default function FeedbackFormPage() {
                   setComment(e.target.value);
                   if (commentError && e.target.value.trim()) {
                     setCommentError(false);
-                    if (!ratingError && !highlightsError) setErrorMsg(null);
+                    if (!ratingError && !nameError && !regNoError) setErrorMsg(null);
                   }
                 }}
                 placeholder="What did you learn today, or how could we improve?"
@@ -303,7 +369,7 @@ export default function FeedbackFormPage() {
             </div>
 
             {/* General error message banner */}
-            {errorMsg && !ratingError && !highlightsError && !commentError && (
+            {errorMsg && !ratingError && !nameError && !regNoError && !commentError && (
               <div className="error-text" style={{ marginBottom: "12px" }}>
                 <IconAlertCircle size={15} stroke={2} />
                 <span>{errorMsg}</span>
