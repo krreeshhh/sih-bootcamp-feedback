@@ -15,6 +15,7 @@ import {
   IconRotateClockwise,
   IconUser,
   IconId,
+  IconDownload,
 } from "@tabler/icons-react";
 
 type RatingType = "sad" | "neutral" | "happy" | "excited";
@@ -186,17 +187,17 @@ export default function FeedbackFormPage() {
             </div>
             <h2 className="success-title">Thanks for the feedback!</h2>
             <p className="success-desc">
-              Your response has been successfully recorded. Best of luck with your hardware
-              projects!
+              Your response has been successfully recorded. You can download the Design &amp;
+              Simulation Softwares guide below.
             </p>
-            <button
-              type="button"
-              onClick={handleReset}
-              className="reset-btn"
+            <a
+              href="/DESIGN AND SIMULATION SOFTWARES.pdf"
+              download="DESIGN AND SIMULATION SOFTWARES.pdf"
+              className="download-btn"
             >
-              <IconRotateClockwise size={16} stroke={2} />
-              Submit another response
-            </button>
+              <IconDownload size={18} stroke={2.2} />
+              <span>Download Software Guide</span>
+            </a>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate>
@@ -230,7 +231,7 @@ export default function FeedbackFormPage() {
                         if (!err && !regNoError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="Your name"
+                    placeholder="Minimum 5 letters"
                     maxLength={20}
                     className={`form-input ${nameError ? "input-error" : ""}`}
                     autoComplete="name"
@@ -263,7 +264,7 @@ export default function FeedbackFormPage() {
                         if (!err && !nameError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="e.g. 25A108001"
+                    placeholder="Minimum 8 characters"
                     maxLength={9}
                     className={`form-input ${regNoError ? "input-error" : ""}`}
                     autoComplete="off"

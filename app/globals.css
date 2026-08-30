@@ -590,6 +590,34 @@ html, body {
   border-color: rgba(255, 255, 255, 0.4);
 }
 
+.download-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid #ffffff;
+  border-radius: 14px;
+  color: #000000;
+  font-size: 0.875rem;
+  font-weight: 600;
+  padding: 12px 22px;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 4px 18px rgba(255, 255, 255, 0.15);
+}
+
+.download-btn:hover {
+  background: rgba(255, 255, 255, 0.92);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 24px rgba(255, 255, 255, 0.25);
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
 /* Footer Tag */
 .footer-text {
   margin-top: 14px;
