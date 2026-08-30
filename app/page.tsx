@@ -333,10 +333,6 @@ export default function FeedbackFormPage() {
           </form>
         )}
       </div>
-
-      <footer className="footer-text">
-        SIH Hardware Bootcamp • Minimal Monochrome Edition
-      </footer>
     </main>
   );
 }
