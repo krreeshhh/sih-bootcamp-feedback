@@ -31,23 +31,24 @@ const RATING_OPTIONS: RatingOption[] = [
 ];
 
 const HIGHLIGHT_OPTIONS = [
-  "Hands-on experience",
-  "Team collaboration",
-  "Problem-solving",
-  "Learning new tools",
-  "Mentorship support",
-  "Project showcase",
+  "Soldering session",
+  "Pace felt fast",
+  "Need more kits",
+  "Loved the demo",
+  "Multimeter walkthrough",
+  "Wanted more time",
 ];
 
 export default function FeedbackFormPage() {
   const [rating, setRating] = useState<RatingType | null>(null);
-  const [confidence, setConfidence] = useState<number>(60);
+  const [confidence, setConfidence] = useState<number>(75);
   const [highlights, setHighlights] = useState<string[]>([]);
   const [comment, setComment] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [ratingError, setRatingError] = useState<boolean>(false);
+  const [commentError, setCommentError] = useState<boolean>(false);
 
   const toggleHighlight = (item: string) => {
     setHighlights((prev) =>
@@ -59,16 +60,25 @@ export default function FeedbackFormPage() {
     setRating(val);
     if (ratingError) {
       setRatingError(false);
-      setErrorMsg(null);
+      if (!commentError) setErrorMsg(null);
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    let hasError = false;
     if (!rating) {
       setRatingError(true);
-      setErrorMsg("Please select an overall rating to continue");
+      hasError = true;
+    }
+    if (!comment.trim()) {
+      setCommentError(true);
+      hasError = true;
+    }
+
+    if (hasError) {
+      setErrorMsg("Please complete the required fields marked with *");
       return;
     }
 
@@ -108,12 +118,13 @@ export default function FeedbackFormPage() {
 
   const handleReset = () => {
     setRating(null);
-    setConfidence(60);
+    setConfidence(75);
     setHighlights([]);
     setComment("");
     setSubmitted(false);
     setErrorMsg(null);
     setRatingError(false);
+    setCommentError(false);
   };
 
   // Dynamic monochrome slider background fill
@@ -197,7 +208,7 @@ export default function FeedbackFormPage() {
             <div className="form-section">
               <div className="section-label-row">
                 <label htmlFor="confidence-range" className="section-label" style={{ margin: 0 }}>
-                  Confidence on Hardware After this
+                  Confidence with the tools
                 </label>
                 <span className="slider-val-badge">{confidence}%</span>
               </div>
@@ -245,24 +256,36 @@ export default function FeedbackFormPage() {
               </div>
             </div>
 
-            {/* Anything Else */}
+            {/* Key Takeaway / Feedback (Compulsory) */}
             <div className="form-section">
               <label htmlFor="feedback-comment" className="section-label">
-                Anything else? <span style={{ color: "var(--text-muted)" }}>(optional)</span>
+                Key takeaway or feedback <span style={{ color: "#ffffff" }}>*</span>
               </label>
               <textarea
                 id="feedback-comment"
                 rows={2}
                 value={comment}
-                onChange={(e) => setComment(e.target.value)}
-                placeholder="Type here..."
-                className="comment-textarea"
+                onChange={(e) => {
+                  setComment(e.target.value);
+                  if (commentError && e.target.value.trim()) {
+                    setCommentError(false);
+                    if (!ratingError) setErrorMsg(null);
+                  }
+                }}
+                placeholder="What did you learn today, or how could we improve?"
+                className={`comment-textarea ${commentError ? "textarea-error" : ""}`}
                 maxLength={500}
               />
+              {commentError && (
+                <div className="error-text">
+                  <IconAlertCircle size={14} stroke={2} />
+                  <span>Please share your takeaway or suggestions</span>
+                </div>
+              )}
             </div>
 
             {/* Error banner if submission failed */}
-            {errorMsg && !ratingError && (
+            {errorMsg && !ratingError && !commentError && (
               <div className="error-text" style={{ marginBottom: "12px" }}>
                 <IconAlertCircle size={15} stroke={2} />
                 <span>{errorMsg}</span>
@@ -291,6 +314,10 @@ export default function FeedbackFormPage() {
           </form>
         )}
       </div>
+
+      <footer className="footer-text">
+        SIH Hardware Bootcamp • Minimal Monochrome Edition
+      </footer>
     </main>
   );
 }
