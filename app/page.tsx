@@ -78,11 +78,34 @@ export default function FeedbackFormPage() {
   const [comment, setComment] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [downloading, setDownloading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [nameError, setNameError] = useState<string | null>(null);
   const [regNoError, setRegNoError] = useState<string | null>(null);
   const [ratingError, setRatingError] = useState<boolean>(false);
   const [commentError, setCommentError] = useState<boolean>(false);
+
+  const handleDownload = async () => {
+    setDownloading(true);
+    try {
+      const response = await fetch("/api/download");
+      if (!response.ok) throw new Error("Download request failed");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = "DESIGN_AND_SIMULATION_SOFTWARES.pdf";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      setTimeout(() => window.URL.revokeObjectURL(url), 1000);
+    } catch (err) {
+      console.error("Direct blob download failed, falling back to server route:", err);
+      window.location.href = "/api/download";
+    } finally {
+      setTimeout(() => setDownloading(false), 800);
+    }
+  };
 
   const toggleHighlight = (item: string) => {
     setHighlights((prev) =>
@@ -190,14 +213,25 @@ export default function FeedbackFormPage() {
               Your response has been successfully recorded. You can download the Design &amp;
               Simulation Softwares guide below.
             </p>
-            <a
-              href="/DESIGN AND SIMULATION SOFTWARES.pdf"
-              download="DESIGN AND SIMULATION SOFTWARES.pdf"
+            <button
+              type="button"
+              onClick={handleDownload}
+              disabled={downloading}
               className="download-btn"
+              aria-label="Download software guide PDF"
             >
-              <IconDownload size={18} stroke={2.2} />
-              <span>Download Software Guide</span>
-            </a>
+              {downloading ? (
+                <>
+                  <div className="spinner" style={{ width: 16, height: 16, borderTopColor: "#000000" }} />
+                  <span>Downloading...</span>
+                </>
+              ) : (
+                <>
+                  <IconDownload size={18} stroke={2.2} />
+                  <span>Download Software Guide</span>
+                </>
+              )}
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate>
@@ -231,7 +265,7 @@ export default function FeedbackFormPage() {
                         if (!err && !regNoError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="Minimum 5 letters"
+                    placeholder="Your name"
                     maxLength={20}
                     className={`form-input ${nameError ? "input-error" : ""}`}
                     autoComplete="name"
@@ -264,7 +298,7 @@ export default function FeedbackFormPage() {
                         if (!err && !nameError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="Minimum 8 characters"
+                    placeholder="e.g. 25A108001"
                     maxLength={9}
                     className={`form-input ${regNoError ? "input-error" : ""}`}
                     autoComplete="off"
