@@ -31,17 +31,17 @@ const RATING_OPTIONS: RatingOption[] = [
 ];
 
 const HIGHLIGHT_OPTIONS = [
-  "Soldering session",
-  "Pace felt fast",
-  "Need more kits",
-  "Loved the demo",
-  "Multimeter walkthrough",
-  "Wanted more time",
+  "Hands-on experience",
+  "Team collaboration",
+  "Problem-solving",
+  "Learning new tools",
+  "Mentorship support",
+  "Project showcase",
 ];
 
 export default function FeedbackFormPage() {
   const [rating, setRating] = useState<RatingType | null>(null);
-  const [confidence, setConfidence] = useState<number>(75);
+  const [confidence, setConfidence] = useState<number>(60);
   const [highlights, setHighlights] = useState<string[]>([]);
   const [comment, setComment] = useState<string>("");
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -108,7 +108,7 @@ export default function FeedbackFormPage() {
 
   const handleReset = () => {
     setRating(null);
-    setConfidence(75);
+    setConfidence(60);
     setHighlights([]);
     setComment("");
     setSubmitted(false);
@@ -197,7 +197,7 @@ export default function FeedbackFormPage() {
             <div className="form-section">
               <div className="section-label-row">
                 <label htmlFor="confidence-range" className="section-label" style={{ margin: 0 }}>
-                  Confidence with the tools
+                  Confidence on Hardware After this
                 </label>
                 <span className="slider-val-badge">{confidence}%</span>
               </div>
@@ -291,10 +291,6 @@ export default function FeedbackFormPage() {
           </form>
         )}
       </div>
-
-      <footer className="footer-text">
-        SIH Hardware Bootcamp • Minimal Monochrome Edition
-      </footer>
     </main>
   );
 }
