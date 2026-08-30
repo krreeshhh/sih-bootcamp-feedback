@@ -40,6 +40,34 @@ const HIGHLIGHT_OPTIONS = [
   "Project showcase",
 ];
 
+const validateName = (val: string): string | null => {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return "Enter your name";
+  }
+  if (trimmed.length < 5 || trimmed.length > 20) {
+    return "Name must be between 5 and 20 letters";
+  }
+  if (!/^[A-Za-z\s]+$/.test(trimmed)) {
+    return "Name must contain only letters";
+  }
+  return null;
+};
+
+const validateRegNo = (val: string): string | null => {
+  const trimmed = val.trim();
+  if (!trimmed) {
+    return "Enter your reg no";
+  }
+  if (trimmed.length < 8 || trimmed.length > 9) {
+    return "Reg No must be 8 to 9 characters";
+  }
+  if (!/^[A-Za-z0-9]+$/.test(trimmed)) {
+    return "Reg No must contain only letters and numbers";
+  }
+  return null;
+};
+
 export default function FeedbackFormPage() {
   const [name, setName] = useState<string>("");
   const [regNo, setRegNo] = useState<string>("");
@@ -50,8 +78,8 @@ export default function FeedbackFormPage() {
   const [submitted, setSubmitted] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [nameError, setNameError] = useState<boolean>(false);
-  const [regNoError, setRegNoError] = useState<boolean>(false);
+  const [nameError, setNameError] = useState<string | null>(null);
+  const [regNoError, setRegNoError] = useState<string | null>(null);
   const [ratingError, setRatingError] = useState<boolean>(false);
   const [commentError, setCommentError] = useState<boolean>(false);
 
@@ -72,26 +100,18 @@ export default function FeedbackFormPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    let hasError = false;
-    if (!name.trim()) {
-      setNameError(true);
-      hasError = true;
-    }
-    if (!regNo.trim()) {
-      setRegNoError(true);
-      hasError = true;
-    }
-    if (!rating) {
-      setRatingError(true);
-      hasError = true;
-    }
-    if (!comment.trim()) {
-      setCommentError(true);
-      hasError = true;
-    }
+    const nameErr = validateName(name);
+    const regNoErr = validateRegNo(regNo);
+    const ratingErr = !rating;
+    const commentErr = !comment.trim();
 
-    if (hasError) {
-      setErrorMsg("Please complete all required fields");
+    setNameError(nameErr);
+    setRegNoError(regNoErr);
+    setRatingError(ratingErr);
+    setCommentError(commentErr);
+
+    if (nameErr || regNoErr || ratingErr || commentErr) {
+      setErrorMsg("Please complete and correct all required fields");
       return;
     }
 
@@ -140,8 +160,8 @@ export default function FeedbackFormPage() {
     setComment("");
     setSubmitted(false);
     setErrorMsg(null);
-    setNameError(false);
-    setRegNoError(false);
+    setNameError(null);
+    setRegNoError(null);
     setRatingError(false);
     setCommentError(false);
   };
@@ -202,13 +222,16 @@ export default function FeedbackFormPage() {
                     type="text"
                     value={name}
                     onChange={(e) => {
-                      setName(e.target.value);
-                      if (nameError && e.target.value.trim()) {
-                        setNameError(false);
-                        if (!ratingError && !commentError && !regNoError) setErrorMsg(null);
+                      const val = e.target.value;
+                      setName(val);
+                      if (nameError) {
+                        const err = validateName(val);
+                        setNameError(err);
+                        if (!err && !regNoError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
                     placeholder="Your name"
+                    maxLength={20}
                     className={`form-input ${nameError ? "input-error" : ""}`}
                     autoComplete="name"
                   />
@@ -216,7 +239,7 @@ export default function FeedbackFormPage() {
                 {nameError && (
                   <div className="error-text">
                     <IconAlertCircle size={14} stroke={2} />
-                    <span>Enter your name</span>
+                    <span>{nameError}</span>
                   </div>
                 )}
               </div>
@@ -232,13 +255,16 @@ export default function FeedbackFormPage() {
                     type="text"
                     value={regNo}
                     onChange={(e) => {
-                      setRegNo(e.target.value);
-                      if (regNoError && e.target.value.trim()) {
-                        setRegNoError(false);
-                        if (!ratingError && !commentError && !nameError) setErrorMsg(null);
+                      const val = e.target.value.toUpperCase();
+                      setRegNo(val);
+                      if (regNoError) {
+                        const err = validateRegNo(val);
+                        setRegNoError(err);
+                        if (!err && !nameError && !ratingError && !commentError) setErrorMsg(null);
                       }
                     }}
-                    placeholder="e.g. 25108.."
+                    placeholder="e.g. 25A108001"
+                    maxLength={9}
                     className={`form-input ${regNoError ? "input-error" : ""}`}
                     autoComplete="off"
                   />
@@ -246,7 +272,7 @@ export default function FeedbackFormPage() {
                 {regNoError && (
                   <div className="error-text">
                     <IconAlertCircle size={14} stroke={2} />
-                    <span>Enter your reg no</span>
+                    <span>{regNoError}</span>
                   </div>
                 )}
               </div>
