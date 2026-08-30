@@ -1,0 +1,68 @@
+Build a single-page web feedback form as a Next.js latest (App Router) project, ready to deploy on Vercel, with feedback stored in Firebase Firestore.
+
+Purpose
+
+This form collects feedback from students after a one-day SIH (Smart India Hackathon) hardware bootcamp covering hardware basics and tools (multimeter, soldering iron, breadboard, etc.). It must be fast to fill out — no more than 20-30 seconds — and playful without using emojis.
+
+Visual design
+Style: Glassmorphism. Full-viewport gradient background (linear-gradient(135deg, #4b6cb7 0%, #182848 100%)). Centered frosted-glass card: background: rgba(255,255,255,0.14), backdrop-filter: blur(20px), border: 1px solid rgba(255,255,255,0.25), border-radius: 24px, soft box-shadow.
+Font: Use Inter (Google Fonts) as the primary typeface — closest free alternative to Apple's SF Pro. Load via next/font/google. Weights: 400, 500, 600.
+Icons: Use Tabler Icons (outline style only, via @tabler/icons-react) instead of emojis — e.g. mood-sad, mood-neutral, mood-smile, bolt, arrow-right, cpu.
+Responsive: Must look correct on mobile (this will mostly be filled out on phones). Card max-width 400px, centered, comfortable tap targets (min 44px height).
+No dark/light mode toggle needed — the gradient background is fixed.
+Form fields (single page, no multi-step)
+Header: small icon + label "SIH hardware bootcamp", heading "How was today?"
+Overall rating — 4 tappable icon buttons in a row (not a 1-5 star or numeric scale): mood-sad, mood-neutral, mood-smile, bolt. Single-select, selected state = brighter/filled background.
+Confidence with tools — a single range slider (0-100), labeled "Confidence with the tools", with an accent-colored thumb matching the glass theme.
+What stood out — 4-6 pre-written tappable chip options (multi-select), e.g. "Soldering session", "Pace felt fast", "Need more kits", "Loved the demo", "Multimeter walkthrough", "Wanted more time". Selected chips get a filled/brighter background.
+Anything else (optional) — a small textarea, 2 rows, placeholder "Type here...".
+Submit button — full width, white background, dark text, label "Submit feedback" with a trailing arrow icon. On submit: disable button, show a lightweight loading state, write to Firestore, then show a success state (checkmark + "Thanks for the feedback!") in place of the form — no page reload, no redirect.
+Functional requirements
+On submit, write a single document to a Firestore collection called feedback with fields:
+  {
+    rating: "sad" | "neutral" | "happy" | "excited",
+    confidence: number,       // 0-100
+    highlights: string[],     // selected chip values
+    comment: string,          // optional, can be empty string
+    createdAt: serverTimestamp()
+  }
+No authentication required — anonymous public submissions.
+Client-side validation: require at least the "overall rating" to be selected before allowing submit. Show a small inline message if they try to submit without it. Slider, chips, and comment are all optional.
+Prevent double-submit (disable button while writing, and again after success).
+Use the Firebase client SDK with Firestore, not the Admin SDK (no server-side auth needed for this use case).
+Environment variables for Firebase config must be read from NEXT_PUBLIC_FIREBASE_* vars (standard Next.js public env convention), not hardcoded.
+Project structure
+app/page.tsx — the form itself (client component)
+lib/firebase.ts — Firebase app + Firestore initialization using env vars
+app/layout.tsx — loads Inter font, sets metadata (title: "Bootcamp Feedback")
+.env.local.example — placeholder file listing required env vars:
+  NEXT_PUBLIC_FIREBASE_API_KEY=
+  NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+  NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+  NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+  NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+  NEXT_PUBLIC_FIREBASE_APP_ID=
+README.md with:
+How to create a Firebase project and enable Firestore (Native mode)
+Firestore security rules to use (public create-only, no read, so submissions are write-only from the client):
+     rules_version = '2';
+     service cloud.firestore {
+       match /databases/{database}/documents {
+         match /feedback/{docId} {
+           allow create: if true;
+           allow read, update, delete: if false;
+         }
+       }
+     }
+How to copy Firebase config values into .env.local
+How to deploy to Vercel (connect repo, add the same env vars in Vercel project settings, deploy)
+Note that this stack comfortably handles 400+ submissions on free tiers (Vercel Hobby + Firebase Spark)
+Tech constraints
+Next.js latest, App Router, TypeScript
+No external UI library (no MUI/Chakra) — hand-roll the styling with plain CSS-in-JS or a single globals.css, to keep the glassmorphism styling fully custom and lightweight
+firebase bun package (client SDK) for Firestore
+@tabler/icons-react for icons
+Keep bundle minimal — no unnecessary dependencies
+Deliverable
+
+A complete, working project I can bun install && bun run dev locally, and deploy directly to Vercel by creating a github repo using github cli and use firebase cli and vercel cli as well with zero further code changes and with all datas added.
