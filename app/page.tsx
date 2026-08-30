@@ -184,7 +184,7 @@ export default function FeedbackFormPage() {
             {/* Overall Rating (Compulsory) */}
             <div className="form-section">
               <label className="section-label">
-                Overall experience <span style={{ color: "#ffffff" }}>*</span>
+                Overall experience 
               </label>
               <div className="rating-grid">
                 {RATING_OPTIONS.map((opt) => {
@@ -219,7 +219,7 @@ export default function FeedbackFormPage() {
             <div className="form-section">
               <div className="section-label-row">
                 <label htmlFor="confidence-range" className="section-label" style={{ margin: 0 }}>
-                  Confidence with the tools <span style={{ color: "#ffffff" }}>*</span>
+                  Confidence with the tools 
                 </label>
                 <span className="slider-val-badge">{confidence}%</span>
               </div>
@@ -249,7 +249,7 @@ export default function FeedbackFormPage() {
             {/* What Stood Out (Compulsory) */}
             <div className="form-section">
               <label className="section-label">
-                What stood out to you? <span style={{ color: "#ffffff" }}>*</span>
+                What stood out to you? 
               </label>
               <div className="chips-grid">
                 {HIGHLIGHT_OPTIONS.map((item) => {
@@ -278,7 +278,7 @@ export default function FeedbackFormPage() {
             {/* Key Takeaway / Feedback (Compulsory) */}
             <div className="form-section">
               <label htmlFor="feedback-comment" className="section-label">
-                Key takeaway or feedback <span style={{ color: "#ffffff" }}>*</span>
+                Key takeaway or feedback 
               </label>
               <textarea
                 id="feedback-comment"
